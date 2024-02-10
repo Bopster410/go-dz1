@@ -14,16 +14,23 @@ type Options struct {
 	ignoreCase bool // -i
 }
 
-func uniq(input string, options Options) string {
-	scanner := bufio.NewScanner(strings.NewReader(input))
+func uniq(input []string, options Options) string {
 	var outputSlice []string
 	var workingLine string = ""
-	for scanner.Scan() {
-		currentLine := scanner.Text()
+	for _, currentLine := range input {
 		if currentLine != workingLine {
 			outputSlice = append(outputSlice, currentLine)
 			workingLine = currentLine
 		}
 	}
 	return strings.Join(outputSlice, "\n")
+}
+
+func parseString(input string) (output []string) {
+	scanner := bufio.NewScanner(strings.NewReader(input))
+	for scanner.Scan() {
+		currentLine := scanner.Text()
+		output = append(output, currentLine)
+	}
+	return
 }

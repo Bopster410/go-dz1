@@ -16,7 +16,7 @@ func TestNoFlags(t *testing.T) {
 	}
 
 	for in, correctOut := range tests {
-		out := uniq(in, Options{})
+		out := uniq(parseString(in), Options{})
 		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
 	}
 }
