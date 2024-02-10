@@ -7,18 +7,14 @@ import (
 
 func uniq(input string) string {
 	scanner := bufio.NewScanner(strings.NewReader(input))
-	var output string
-	seen := map[string]bool{}
+	var outputSlice []string
+	var workingLine string = ""
 	for scanner.Scan() {
 		currentLine := scanner.Text()
-		if _, exists := seen[currentLine]; !exists {
-			if len(seen) == 0 {
-				output += currentLine
-			} else {
-				output += "\n" + currentLine
-			}
-			seen[currentLine] = true
+		if currentLine != workingLine {
+			outputSlice = append(outputSlice, currentLine)
+			workingLine = currentLine
 		}
 	}
-	return output
+	return strings.Join(outputSlice, "\n")
 }

@@ -30,3 +30,17 @@ func TestDifferentLines(t *testing.T) {
 		t.Fatalf("Strings don't match!\n(correct is '%v', yours is '%v'", correctOutput, output)
 	}
 }
+
+func TestDeleteIfNear(t *testing.T) {
+	input := `hi
+hello world!
+hello world!
+hi`
+	output := uniq(input)
+	correctOutput := `hi
+hello world!
+hi`
+	if output != correctOutput {
+		t.Fatalf("Strings don't match!\n(correct is '%v', yours is '%v'", correctOutput, output)
+	}
+}
