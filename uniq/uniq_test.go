@@ -8,21 +8,21 @@ import (
 
 func TestNoDuplicate(t *testing.T) {
 	input := "hello world!"
-	output := uniq(input)
+	output := uniq(input, Options{})
 	correctOutput := "hello world!"
 	require.Equalf(t, correctOutput, output, "Strings don't match!\n(correct is '%v', yours is '%v'", correctOutput, output)
 }
 
 func TestOneDuplicate(t *testing.T) {
 	input := "hello world!\nhello world!"
-	output := uniq(input)
+	output := uniq(input, Options{})
 	correctOutput := "hello world!"
 	require.Equalf(t, correctOutput, output, "Strings don't match!\n(correct is '%v', yours is '%v'", correctOutput, output)
 }
 
 func TestDifferentLines(t *testing.T) {
 	input := "hello world!\nhello world!\nhi"
-	output := uniq(input)
+	output := uniq(input, Options{})
 	correctOutput := "hello world!\nhi"
 	require.Equalf(t, correctOutput, output, "Strings don't match!\n(correct is '%v', yours is '%v'", correctOutput, output)
 }
@@ -32,7 +32,7 @@ func TestDeleteIfNear(t *testing.T) {
 hello world!
 hello world!
 hi`
-	output := uniq(input)
+	output := uniq(input, Options{})
 	correctOutput := `hi
 hello world!
 hi`
@@ -47,7 +47,7 @@ hello world!
 
 
 hi`
-	output := uniq(input)
+	output := uniq(input, Options{})
 	correctOutput := `hi
 
 hello world!
