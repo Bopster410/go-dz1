@@ -6,52 +6,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNoDuplicate(t *testing.T) {
-	input := "hello world!"
-	output := uniq(input, Options{})
-	correctOutput := "hello world!"
-	require.Equalf(t, correctOutput, output, "Strings don't match!\n(correct is '%v', yours is '%v'", correctOutput, output)
-}
+func TestNoFlags(t *testing.T) {
+	tests := map[string]string{
+		"hello world!":                             "hello world!",
+		"hello world!\nhello world!":               "hello world!",
+		"hello world!\nhello world!\nhi":           "hello world!\nhi",
+		"hi\nhello world!\nhello world!\nhi":       "hi\nhello world!\nhi",
+		"hi\n\nhello world!\nhello world!\n\n\nhi": "hi\n\nhello world!\n\nhi",
+	}
 
-func TestOneDuplicate(t *testing.T) {
-	input := "hello world!\nhello world!"
-	output := uniq(input, Options{})
-	correctOutput := "hello world!"
-	require.Equalf(t, correctOutput, output, "Strings don't match!\n(correct is '%v', yours is '%v'", correctOutput, output)
-}
-
-func TestDifferentLines(t *testing.T) {
-	input := "hello world!\nhello world!\nhi"
-	output := uniq(input, Options{})
-	correctOutput := "hello world!\nhi"
-	require.Equalf(t, correctOutput, output, "Strings don't match!\n(correct is '%v', yours is '%v'", correctOutput, output)
-}
-
-func TestDeleteIfNear(t *testing.T) {
-	input := `hi
-hello world!
-hello world!
-hi`
-	output := uniq(input, Options{})
-	correctOutput := `hi
-hello world!
-hi`
-	require.Equalf(t, correctOutput, output, "Strings don't match!\n(correct is '%v', yours is '%v'", correctOutput, output)
-}
-
-func TestEmptyLines(t *testing.T) {
-	input := `hi
-
-hello world!
-hello world!
-
-
-hi`
-	output := uniq(input, Options{})
-	correctOutput := `hi
-
-hello world!
-
-hi`
-	require.Equalf(t, correctOutput, output, "Strings don't match!\n(correct is '%v', yours is '%v'", correctOutput, output)
+	for in, correctOut := range tests {
+		out := uniq(in, Options{})
+		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
+	}
 }
