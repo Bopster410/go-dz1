@@ -23,7 +23,7 @@ func uniq(input []string, options Options) string {
 	for _, currentLine := range input {
 		if currentLine != prevLine {
 			// If -d flag
-			if options.repeated && counter > 1 || !options.repeated {
+			if (options.repeated && counter > 1 || !options.repeated) && (options.unique && counter == 1 || !options.unique) {
 				formattedLine := prevLine
 				// If -c flag
 				if options.count {
@@ -39,7 +39,7 @@ func uniq(input []string, options Options) string {
 		}
 	}
 
-	if options.repeated && counter > 1 || !options.repeated {
+	if (options.repeated && counter > 1 || !options.repeated) && (options.unique && counter == 1 || !options.unique) {
 		formattedLine := prevLine
 		if options.count {
 			formattedLine = fmt.Sprintf("%d %v", counter, formattedLine)
