@@ -30,7 +30,11 @@ func processLine(line string, counter int, options Options) (processed string, e
 	return
 }
 
-func uniq(input []string, options Options) string {
+func uniq(input []string, options Options) (string, error) {
+	if options.unique && options.repeated || options.unique && options.count || options.repeated && options.unique {
+		return "", fmt.Errorf("-u, -d, -c flags can't be used simultaneously")
+	}
+
 	var outputSlice []string
 	var prevLine string = input[0]
 	var counter int = 0
@@ -54,7 +58,7 @@ func uniq(input []string, options Options) string {
 		outputSlice = append(outputSlice, processed)
 	}
 
-	return strings.Join(outputSlice, "\n")
+	return strings.Join(outputSlice, "\n"), nil
 }
 
 func parseString(input string) (output []string) {

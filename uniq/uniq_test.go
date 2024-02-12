@@ -16,8 +16,9 @@ func TestNoFlags(t *testing.T) {
 	}
 
 	for in, correctOut := range tests {
-		out := uniq(parseString(in), Options{})
+		out, err := uniq(parseString(in), Options{})
 		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
+		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
 	}
 }
 
@@ -31,8 +32,9 @@ func TestCount(t *testing.T) {
 	}
 
 	for in, correctOut := range tests {
-		out := uniq(parseString(in), Options{count: true})
+		out, err := uniq(parseString(in), Options{count: true})
 		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
+		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
 	}
 }
 
@@ -46,8 +48,9 @@ func TestRepeated(t *testing.T) {
 	}
 
 	for in, correctOut := range tests {
-		out := uniq(parseString(in), Options{repeated: true})
+		out, err := uniq(parseString(in), Options{repeated: true})
 		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
+		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
 	}
 }
 
@@ -61,8 +64,9 @@ func TestUnique(t *testing.T) {
 	}
 
 	for in, correctOut := range tests {
-		out := uniq(parseString(in), Options{unique: true})
+		out, err := uniq(parseString(in), Options{unique: true})
 		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
+		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
 	}
 }
 
