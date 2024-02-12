@@ -70,6 +70,22 @@ func TestUnique(t *testing.T) {
 	}
 }
 
+func TestNoParallelFlags(t *testing.T) {
+	tests := []string{
+		"hello world!",
+		"hello world!\nhello world!",
+		"hello world!\nhello world!\nhi",
+		"hi\nhello world!\nhello world!\nhi",
+		"hi\n\nhello world!\nhello world!\n\n\nhi",
+	}
+
+	for _, in := range tests {
+		out, err := uniq(parseString(in), Options{unique: true, repeated: true, count: true})
+		require.Equalf(t, "", out, "Strings don't match!\ntest string - '%v'", in)
+		require.NotEqualf(t, err, nil, "Must be an error!\ntest string - '%v'", in)
+	}
+}
+
 // func TestCount(t *testing.T) {
 // 	tests := map[string]struct {
 // 		out		string
