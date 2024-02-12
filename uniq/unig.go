@@ -15,6 +15,21 @@ type Options struct {
 	ignoreCase bool // -i
 }
 
+func processLine(line string, counter int, options Options) (processed string, err error) {
+	// If -d flag or -u flag
+	if (options.repeated && counter > 1 || !options.repeated) && (options.unique && counter == 1 || !options.unique) {
+		processed = line
+		// If -c flag
+		if options.count {
+			processed = fmt.Sprintf("%d %v", counter, line)
+		}
+	} else {
+		err = fmt.Errorf("current line doesn't meet the requirements")
+	}
+
+	return
+}
+
 func uniq(input []string, options Options) string {
 	var outputSlice []string
 	var prevLine string = input[0]
@@ -22,14 +37,9 @@ func uniq(input []string, options Options) string {
 
 	for _, currentLine := range input {
 		if currentLine != prevLine {
-			// If -d flag
-			if (options.repeated && counter > 1 || !options.repeated) && (options.unique && counter == 1 || !options.unique) {
-				formattedLine := prevLine
-				// If -c flag
-				if options.count {
-					formattedLine = fmt.Sprintf("%d %v", counter, formattedLine)
-				}
-				outputSlice = append(outputSlice, formattedLine)
+			processed, err := processLine(prevLine, counter, options)
+			if err == nil {
+				outputSlice = append(outputSlice, processed)
 			}
 
 			prevLine = currentLine
@@ -39,12 +49,9 @@ func uniq(input []string, options Options) string {
 		}
 	}
 
-	if (options.repeated && counter > 1 || !options.repeated) && (options.unique && counter == 1 || !options.unique) {
-		formattedLine := prevLine
-		if options.count {
-			formattedLine = fmt.Sprintf("%d %v", counter, formattedLine)
-		}
-		outputSlice = append(outputSlice, formattedLine)
+	processed, err := processLine(prevLine, counter, options)
+	if err == nil {
+		outputSlice = append(outputSlice, processed)
 	}
 
 	return strings.Join(outputSlice, "\n")
