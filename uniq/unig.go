@@ -22,11 +22,16 @@ func uniq(input []string, options Options) string {
 
 	for _, currentLine := range input {
 		if currentLine != prevLine {
-			formattedLine := prevLine
-			if options.count {
-				formattedLine = fmt.Sprintf("%d %v", counter, prevLine)
+			// If -d flag
+			if options.repeated && counter > 1 || !options.repeated {
+				formattedLine := prevLine
+				// If -c flag
+				if options.count {
+					formattedLine = fmt.Sprintf("%d %v", counter, formattedLine)
+				}
+				outputSlice = append(outputSlice, formattedLine)
 			}
-			outputSlice = append(outputSlice, formattedLine)
+
 			prevLine = currentLine
 			counter = 1
 		} else {
@@ -34,12 +39,13 @@ func uniq(input []string, options Options) string {
 		}
 	}
 
-	formattedLine := prevLine
-	if options.count {
-		formattedLine = fmt.Sprintf("%d %v", counter, prevLine)
+	if options.repeated && counter > 1 || !options.repeated {
+		formattedLine := prevLine
+		if options.count {
+			formattedLine = fmt.Sprintf("%d %v", counter, formattedLine)
+		}
+		outputSlice = append(outputSlice, formattedLine)
 	}
-
-	outputSlice = append(outputSlice, formattedLine)
 
 	return strings.Join(outputSlice, "\n")
 }

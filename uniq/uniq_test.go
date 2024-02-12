@@ -36,6 +36,21 @@ func TestCount(t *testing.T) {
 	}
 }
 
+func TestRepeated(t *testing.T) {
+	tests := map[string]string{
+		"hello world!":                             "",
+		"hello world!\nhello world!":               "hello world!",
+		"hello world!\nhello world!\nhi":           "hello world!",
+		"hi\nhello world!\nhello world!\nhi":       "hello world!",
+		"hi\n\nhello world!\nhello world!\n\n\nhi": "hello world!\n",
+	}
+
+	for in, correctOut := range tests {
+		out := uniq(parseString(in), Options{repeated: true})
+		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
+	}
+}
+
 // func TestCount(t *testing.T) {
 // 	tests := map[string]struct {
 // 		out		string
