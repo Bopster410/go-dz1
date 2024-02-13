@@ -285,3 +285,95 @@ func TestSkipFieldsRepeated(t *testing.T) {
 		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
 	}
 }
+
+func TestSkipChars(t *testing.T) {
+	tests := map[string]struct {
+		out     string
+		options Options
+	}{
+		"hello world!": {
+			out:     "hello world!",
+			options: Options{skipChars: 1},
+		},
+		"hello world!\nhello world!": {
+			out:     "hello world!",
+			options: Options{skipChars: 1},
+		},
+		"hello world!\nhello world!\nhi": {
+			out:     "hello world!\nhi",
+			options: Options{skipChars: 5},
+		},
+		"hello world!\n\n\nhello world!": {
+			out:     "hello world!\n\nhello world!",
+			options: Options{skipChars: 3},
+		},
+		"kingsman\nwingsman": {
+			out:     "kingsman",
+			options: Options{skipChars: 5},
+		},
+		"kingsman\nman": {
+			out:     "kingsman\nman",
+			options: Options{skipChars: 5},
+		},
+		"kingsman\nhi\nwingsman\nkingsman": {
+			out:     "kingsman\nhi\nwingsman",
+			options: Options{skipChars: 5},
+		},
+		"Привет мир!\nО нет, мир!": {
+			out:     "Привет мир!",
+			options: Options{skipChars: 6},
+		},
+		"Привет мир!\nмир!": {
+			out:     "Привет мир!\nмир!",
+			options: Options{skipChars: 6},
+		},
+	}
+
+	for in, testParams := range tests {
+		out, err := uniq(parseString(in), testParams.options)
+		require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
+		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+	}
+}
+
+func TestSkipFieldsChars(t *testing.T) {
+	tests := map[string]struct {
+		out     string
+		options Options
+	}{
+		"hello world!": {
+			out:     "hello world!",
+			options: Options{skipFields: 1, skipChars: 1},
+		},
+		"hello world!\nhello world!": {
+			out:     "hello world!",
+			options: Options{skipFields: 1, skipChars: 2},
+		},
+		"hello world!\nhello world!\nhi": {
+			out:     "hello world!\nhi",
+			options: Options{skipFields: 1, skipChars: 5},
+		},
+		"hello world!\n\n\nhello world!": {
+			out:     "hello world!\n\nhello world!",
+			options: Options{skipFields: 1, skipChars: 3},
+		},
+		"hello world!\n\nhello world!": {
+			out:     "hello world!",
+			options: Options{skipFields: 1, skipChars: 10},
+		},
+		"hello epicworld!\nhello damnworld!": {
+			out:     "hello epicworld!",
+			options: Options{skipFields: 1, skipChars: 5},
+		},
+		"Привет мир!\nмир!": {
+			out:     "Привет мир!\nмир!",
+			options: Options{skipFields: 1, skipChars: 2},
+		},
+	}
+
+	for in, testParams := range tests {
+		out, err := uniq(parseString(in), testParams.options)
+		require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
+		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+	}
+}

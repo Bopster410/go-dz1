@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"strings"
+	"unicode/utf8"
 )
 
 type Options struct {
@@ -30,24 +31,32 @@ func processLine(line string, counter int, options Options) (processed string, e
 	return
 }
 
-func getPartToCompare(currentLine string, options Options) string {
+func getPartToCompare(currentLine string, options Options) (partToCompare string) {
 	skippedFields := 0
 	wasSkipped := false
 	indToSlice := 0
 	for ind, symb := range currentLine {
 		if symb == ' ' && !wasSkipped {
 			wasSkipped = true
-		} else if symb != ' ' && wasSkipped {
 			skippedFields++
-			wasSkipped = false
 			indToSlice = ind
+		} else if symb != ' ' && wasSkipped {
+			wasSkipped = false
 		}
 
 		if skippedFields == options.skipFields {
 			break
 		}
 	}
-	return currentLine[indToSlice:]
+
+	partToCompare = currentLine[indToSlice:]
+	if options.skipChars >= utf8.RuneCountInString(partToCompare) {
+		partToCompare = ""
+	} else {
+		partToCompare = string([]rune(partToCompare)[options.skipChars:])
+	}
+
+	return
 }
 
 func uniq(input []string, options Options) (string, error) {
@@ -62,7 +71,7 @@ func uniq(input []string, options Options) (string, error) {
 
 	for i, currentLine := range input {
 		var partToCompare string = currentLine
-		if options.skipFields > 0 {
+		if options.skipFields > 0 || options.skipChars > 0 {
 			partToCompare = getPartToCompare(currentLine, options)
 			if i == 0 {
 				prevPartToCompare = partToCompare
