@@ -86,22 +86,52 @@ func TestNoParallelFlags(t *testing.T) {
 	}
 }
 
-// func TestCount(t *testing.T) {
-// 	tests := map[string]struct {
-// 		out		string
-// 		options	Options
-// 	} {
-// 		"hello world!\nhello world!\nhi": {
-// 			out: "hello world!",
-// 			options: Options{count: true},
-// 		},
-// 		"hello world!\nhello world!\nhi":           "hello world!\nhi",
-// 		"hi\nhello world!\nhello world!\nhi":       "hi\nhello world!\nhi",
-// 		"hi\n\nhello world!\nhello world!\n\n\nhi": "hi\n\nhello world!\n\nhi",
-// 	}
+func TestSkipFields(t *testing.T) {
+	tests := map[string]struct {
+		out     string
+		options Options
+	}{
+		"hello world!": {
+			out:     "hello world!",
+			options: Options{skipFields: 1},
+		},
+		"hello world!\nhello world!": {
+			out:     "hello world!",
+			options: Options{skipFields: 1},
+		},
+		"hello world!\nhello world!\nhi": {
+			out:     "hello world!\nhi",
+			options: Options{skipFields: 1},
+		},
+		"hello world!\n\n\nhello world!": {
+			out:     "hello world!\n\nhello world!",
+			options: Options{skipFields: 1},
+		},
+		"hi world!\nhello world!\nhello world!": {
+			out:     "hi world!",
+			options: Options{skipFields: 1},
+		},
+		"hi world!\nhi\nhello world!\nhello world!": {
+			out:     "hi world!\nhi\nhello world!",
+			options: Options{skipFields: 1},
+		},
+		"hi world!\nhello epic world!\nhello world!": {
+			out:     "hi world!",
+			options: Options{skipFields: 2},
+		},
+		"hi hello George\namazing work George\nhello world!\nbye bye George": {
+			out:     "hi hello George\nhello world!\nbye bye George",
+			options: Options{skipFields: 2},
+		},
+		"Привет мир!\nО мир!": {
+			out:     "Привет мир!",
+			options: Options{skipFields: 1},
+		},
+	}
 
-// 	for in, correctOut := range tests {
-// 		out := uniq(parseString(in), Options{skip})
-// 		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
-// 	}
-// }
+	for in, testParams := range tests {
+		out, err := uniq(parseString(in), testParams.options)
+		require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
+		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+	}
+}

@@ -37,16 +37,42 @@ func uniq(input []string, options Options) (string, error) {
 
 	var outputSlice []string
 	var prevLine string = input[0]
+	var prevPartToCompare = prevLine
 	var counter int = 0
 
-	for _, currentLine := range input {
-		if currentLine != prevLine {
+	for i, currentLine := range input {
+		var partToCompare string = currentLine
+		if options.skipFields > 0 {
+			skippedFields := 0
+			wasSkipped := false
+			indToSlice := 0
+			for ind, symb := range currentLine {
+				if symb == ' ' && !wasSkipped {
+					wasSkipped = true
+				} else if symb != ' ' && wasSkipped {
+					skippedFields++
+					wasSkipped = false
+					indToSlice = ind
+				}
+
+				if skippedFields == options.skipFields {
+					break
+				}
+			}
+			partToCompare = currentLine[indToSlice:]
+			if i == 0 {
+				prevPartToCompare = partToCompare
+			}
+		}
+
+		if partToCompare != prevPartToCompare {
 			processed, err := processLine(prevLine, counter, options)
 			if err == nil {
 				outputSlice = append(outputSlice, processed)
 			}
 
 			prevLine = currentLine
+			prevPartToCompare = partToCompare
 			counter = 1
 		} else {
 			counter++
