@@ -135,3 +135,53 @@ func TestSkipFields(t *testing.T) {
 		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
 	}
 }
+
+func TestSkipFieldsCount(t *testing.T) {
+	tests := map[string]struct {
+		out     string
+		options Options
+	}{
+		"hello world!": {
+			out:     "1 hello world!",
+			options: Options{count: true, skipFields: 1},
+		},
+		"hello world!\nhello world!": {
+			out:     "2 hello world!",
+			options: Options{count: true, skipFields: 1},
+		},
+		"hello world!\nhello world!\nhi": {
+			out:     "2 hello world!\n1 hi",
+			options: Options{count: true, skipFields: 1},
+		},
+		"hello world!\n\n\nhello world!": {
+			out:     "1 hello world!\n2 \n1 hello world!",
+			options: Options{count: true, skipFields: 1},
+		},
+		"hi world!\nhello world!\nhello world!": {
+			out:     "3 hi world!",
+			options: Options{count: true, skipFields: 1},
+		},
+		"hi world!\nhi\nhello world!\nhello world!": {
+			out:     "1 hi world!\n1 hi\n2 hello world!",
+			options: Options{count: true, skipFields: 1},
+		},
+		"hi world!\nhello epic world!\nhello world!": {
+			out:     "3 hi world!",
+			options: Options{count: true, skipFields: 2},
+		},
+		"hi hello George\namazing work George\nhello world!\nbye bye George": {
+			out:     "2 hi hello George\n1 hello world!\n1 bye bye George",
+			options: Options{count: true, skipFields: 2},
+		},
+		"Привет мир!\nО мир!": {
+			out:     "2 Привет мир!",
+			options: Options{count: true, skipFields: 1},
+		},
+	}
+
+	for in, testParams := range tests {
+		out, err := uniq(parseString(in), testParams.options)
+		require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
+		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+	}
+}
