@@ -62,7 +62,7 @@ func getPartToCompare(currentLine string, options Options) (partToCompare string
 	return
 }
 
-func uniq(input []string, options Options) (string, error) {
+func Uniq(input []string, options Options) (string, error) {
 	if options.unique && options.repeated || options.unique && options.count || options.repeated && options.unique {
 		return "", fmt.Errorf("-u, -d, -c flags can't be used simultaneously")
 	}
