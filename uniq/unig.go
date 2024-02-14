@@ -8,21 +8,21 @@ import (
 )
 
 type Options struct {
-	count      bool // -c
-	repeated   bool // -d
-	unique     bool // -u
-	skipFields int  // -f
-	skipChars  int  // -s
-	ignoreCase bool // -i
+	Count      bool // -c
+	Repeated   bool // -d
+	Unique     bool // -u
+	SkipFields int  // -f
+	SkipChars  int  // -s
+	IgnoreCase bool // -i
 }
 
-func processLine(line string, counter int, options Options) (processed string, err error) {
+func processLine(line string, Counter int, options Options) (processed string, err error) {
 	// If -d flag or -u flag
-	if (options.repeated && counter > 1 || !options.repeated) && (options.unique && counter == 1 || !options.unique) {
+	if (options.Repeated && Counter > 1 || !options.Repeated) && (options.Unique && Counter == 1 || !options.Unique) {
 		processed = line
 		// If -c flag
-		if options.count {
-			processed = fmt.Sprintf("%d %v", counter, line)
+		if options.Count {
+			processed = fmt.Sprintf("%d %v", Counter, line)
 		}
 	} else {
 		err = fmt.Errorf("current line doesn't meet the requirements")
@@ -44,17 +44,17 @@ func getPartToCompare(currentLine string, options Options) (partToCompare string
 			wasSkipped = false
 		}
 
-		if skippedFields == options.skipFields {
+		if skippedFields == options.SkipFields {
 			break
 		}
 	}
 
 	partToCompare = currentLine[indToSlice:]
-	if options.skipChars >= utf8.RuneCountInString(partToCompare) {
+	if options.SkipChars >= utf8.RuneCountInString(partToCompare) {
 		partToCompare = ""
 	} else {
-		partToCompare = string([]rune(partToCompare)[options.skipChars:])
-		if options.ignoreCase {
+		partToCompare = string([]rune(partToCompare)[options.SkipChars:])
+		if options.IgnoreCase {
 			partToCompare = strings.ToLower(partToCompare)
 		}
 	}
@@ -63,18 +63,18 @@ func getPartToCompare(currentLine string, options Options) (partToCompare string
 }
 
 func Uniq(input []string, options Options) (string, error) {
-	if options.unique && options.repeated || options.unique && options.count || options.repeated && options.unique {
+	if options.Unique && options.Repeated || options.Unique && options.Count || options.Repeated && options.Unique {
 		return "", fmt.Errorf("-u, -d, -c flags can't be used simultaneously")
 	}
 
 	var outputSlice []string
 	var prevLine string = input[0]
 	var prevPartToCompare = prevLine
-	var counter int = 0
+	var Counter int = 0
 
 	for i, currentLine := range input {
 		var partToCompare string = currentLine
-		if options.skipFields > 0 || options.skipChars > 0 || options.ignoreCase {
+		if options.SkipFields > 0 || options.SkipChars > 0 || options.IgnoreCase {
 			partToCompare = getPartToCompare(currentLine, options)
 			if i == 0 {
 				prevPartToCompare = partToCompare
@@ -82,20 +82,20 @@ func Uniq(input []string, options Options) (string, error) {
 		}
 
 		if partToCompare != prevPartToCompare {
-			processed, err := processLine(prevLine, counter, options)
+			processed, err := processLine(prevLine, Counter, options)
 			if err == nil {
 				outputSlice = append(outputSlice, processed)
 			}
 
 			prevLine = currentLine
 			prevPartToCompare = partToCompare
-			counter = 1
+			Counter = 1
 		} else {
-			counter++
+			Counter++
 		}
 	}
 
-	processed, err := processLine(prevLine, counter, options)
+	processed, err := processLine(prevLine, Counter, options)
 	if err == nil {
 		outputSlice = append(outputSlice, processed)
 	}

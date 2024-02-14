@@ -32,7 +32,7 @@ func TestCount(t *testing.T) {
 	}
 
 	for in, correctOut := range tests {
-		out, err := Uniq(parseString(in), Options{count: true})
+		out, err := Uniq(parseString(in), Options{Count: true})
 		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
 		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
 	}
@@ -48,7 +48,7 @@ func TestRepeated(t *testing.T) {
 	}
 
 	for in, correctOut := range tests {
-		out, err := Uniq(parseString(in), Options{repeated: true})
+		out, err := Uniq(parseString(in), Options{Repeated: true})
 		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
 		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
 	}
@@ -64,7 +64,7 @@ func TestUnique(t *testing.T) {
 	}
 
 	for in, correctOut := range tests {
-		out, err := Uniq(parseString(in), Options{unique: true})
+		out, err := Uniq(parseString(in), Options{Unique: true})
 		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
 		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
 	}
@@ -80,7 +80,7 @@ func TestNoParallelFlags(t *testing.T) {
 	}
 
 	for _, in := range tests {
-		out, err := Uniq(parseString(in), Options{unique: true, repeated: true, count: true})
+		out, err := Uniq(parseString(in), Options{Unique: true, Repeated: true, Count: true})
 		require.Equalf(t, "", out, "Strings don't match!\ntest string - '%v'", in)
 		require.NotEqualf(t, err, nil, "Must be an error!\ntest string - '%v'", in)
 	}
@@ -93,39 +93,39 @@ func TestSkipFields(t *testing.T) {
 	}{
 		"hello world!": {
 			out:     "hello world!",
-			options: Options{skipFields: 1},
+			options: Options{SkipFields: 1},
 		},
 		"hello world!\nhello world!": {
 			out:     "hello world!",
-			options: Options{skipFields: 1},
+			options: Options{SkipFields: 1},
 		},
 		"hello world!\nhello world!\nhi": {
 			out:     "hello world!\nhi",
-			options: Options{skipFields: 1},
+			options: Options{SkipFields: 1},
 		},
 		"hello world!\n\n\nhello world!": {
 			out:     "hello world!\n\nhello world!",
-			options: Options{skipFields: 1},
+			options: Options{SkipFields: 1},
 		},
 		"hi world!\nhello world!\nhello world!": {
 			out:     "hi world!",
-			options: Options{skipFields: 1},
+			options: Options{SkipFields: 1},
 		},
 		"hi world!\nhi\nhello world!\nhello world!": {
 			out:     "hi world!\nhi\nhello world!",
-			options: Options{skipFields: 1},
+			options: Options{SkipFields: 1},
 		},
 		"hi world!\nhello epic world!\nhello world!": {
 			out:     "hi world!",
-			options: Options{skipFields: 2},
+			options: Options{SkipFields: 2},
 		},
 		"hi hello George\namazing work George\nhello world!\nbye bye George": {
 			out:     "hi hello George\nhello world!\nbye bye George",
-			options: Options{skipFields: 2},
+			options: Options{SkipFields: 2},
 		},
 		"Привет мир!\nО мир!": {
 			out:     "Привет мир!",
-			options: Options{skipFields: 1},
+			options: Options{SkipFields: 1},
 		},
 	}
 
@@ -143,39 +143,39 @@ func TestSkipFieldsCount(t *testing.T) {
 	}{
 		"hello world!": {
 			out:     "1 hello world!",
-			options: Options{count: true, skipFields: 1},
+			options: Options{Count: true, SkipFields: 1},
 		},
 		"hello world!\nhello world!": {
 			out:     "2 hello world!",
-			options: Options{count: true, skipFields: 1},
+			options: Options{Count: true, SkipFields: 1},
 		},
 		"hello world!\nhello world!\nhi": {
 			out:     "2 hello world!\n1 hi",
-			options: Options{count: true, skipFields: 1},
+			options: Options{Count: true, SkipFields: 1},
 		},
 		"hello world!\n\n\nhello world!": {
 			out:     "1 hello world!\n2 \n1 hello world!",
-			options: Options{count: true, skipFields: 1},
+			options: Options{Count: true, SkipFields: 1},
 		},
 		"hi world!\nhello world!\nhello world!": {
 			out:     "3 hi world!",
-			options: Options{count: true, skipFields: 1},
+			options: Options{Count: true, SkipFields: 1},
 		},
 		"hi world!\nhi\nhello world!\nhello world!": {
 			out:     "1 hi world!\n1 hi\n2 hello world!",
-			options: Options{count: true, skipFields: 1},
+			options: Options{Count: true, SkipFields: 1},
 		},
 		"hi world!\nhello epic world!\nhello world!": {
 			out:     "3 hi world!",
-			options: Options{count: true, skipFields: 2},
+			options: Options{Count: true, SkipFields: 2},
 		},
 		"hi hello George\namazing work George\nhello world!\nbye bye George": {
 			out:     "2 hi hello George\n1 hello world!\n1 bye bye George",
-			options: Options{count: true, skipFields: 2},
+			options: Options{Count: true, SkipFields: 2},
 		},
 		"Привет мир!\nО мир!": {
 			out:     "2 Привет мир!",
-			options: Options{count: true, skipFields: 1},
+			options: Options{Count: true, SkipFields: 1},
 		},
 	}
 
@@ -193,39 +193,39 @@ func TestSkipFieldsUnique(t *testing.T) {
 	}{
 		"hello world!": {
 			out:     "hello world!",
-			options: Options{unique: true, skipFields: 1},
+			options: Options{Unique: true, SkipFields: 1},
 		},
 		"hello world!\nhello world!": {
 			out:     "",
-			options: Options{unique: true, skipFields: 1},
+			options: Options{Unique: true, SkipFields: 1},
 		},
 		"hello world!\nhello world!\nhi": {
 			out:     "hi",
-			options: Options{unique: true, skipFields: 1},
+			options: Options{Unique: true, SkipFields: 1},
 		},
 		"hello world!\n\n\nhello world!": {
 			out:     "hello world!\nhello world!",
-			options: Options{unique: true, skipFields: 1},
+			options: Options{Unique: true, SkipFields: 1},
 		},
 		"hi world!\nhello world!\nhello world!": {
 			out:     "",
-			options: Options{unique: true, skipFields: 1},
+			options: Options{Unique: true, SkipFields: 1},
 		},
 		"hi world!\nhi\nhello world!\nhello world!": {
 			out:     "hi world!\nhi",
-			options: Options{unique: true, skipFields: 1},
+			options: Options{Unique: true, SkipFields: 1},
 		},
 		"hi world!\nhello epic world!\nhello world!": {
 			out:     "",
-			options: Options{unique: true, skipFields: 2},
+			options: Options{Unique: true, SkipFields: 2},
 		},
 		"hi hello George\namazing work George\nhello world!\nbye bye George": {
 			out:     "hello world!\nbye bye George",
-			options: Options{unique: true, skipFields: 2},
+			options: Options{Unique: true, SkipFields: 2},
 		},
 		"Привет мир!\nО мир!": {
 			out:     "",
-			options: Options{unique: true, skipFields: 1},
+			options: Options{Unique: true, SkipFields: 1},
 		},
 	}
 
@@ -243,39 +243,39 @@ func TestSkipFieldsRepeated(t *testing.T) {
 	}{
 		"hello world!": {
 			out:     "",
-			options: Options{repeated: true, skipFields: 1},
+			options: Options{Repeated: true, SkipFields: 1},
 		},
 		"hello world!\nhello world!": {
 			out:     "hello world!",
-			options: Options{repeated: true, skipFields: 1},
+			options: Options{Repeated: true, SkipFields: 1},
 		},
 		"hello world!\nhello world!\nhi": {
 			out:     "hello world!",
-			options: Options{repeated: true, skipFields: 1},
+			options: Options{Repeated: true, SkipFields: 1},
 		},
 		"hello world!\n\n\nhello world!": {
 			out:     "",
-			options: Options{repeated: true, skipFields: 1},
+			options: Options{Repeated: true, SkipFields: 1},
 		},
 		"hi world!\nhello world!\nhello world!": {
 			out:     "hi world!",
-			options: Options{repeated: true, skipFields: 1},
+			options: Options{Repeated: true, SkipFields: 1},
 		},
 		"hi world!\nhi\nhello world!\nhello world!": {
 			out:     "hello world!",
-			options: Options{repeated: true, skipFields: 1},
+			options: Options{Repeated: true, SkipFields: 1},
 		},
 		"hi world!\nhello epic world!\nhello world!": {
 			out:     "hi world!",
-			options: Options{repeated: true, skipFields: 2},
+			options: Options{Repeated: true, SkipFields: 2},
 		},
 		"hi hello George\namazing work George\nhello world!\nbye bye George": {
 			out:     "hi hello George",
-			options: Options{repeated: true, skipFields: 2},
+			options: Options{Repeated: true, SkipFields: 2},
 		},
 		"Привет мир!\nО мир!": {
 			out:     "Привет мир!",
-			options: Options{repeated: true, skipFields: 1},
+			options: Options{Repeated: true, SkipFields: 1},
 		},
 	}
 
@@ -293,39 +293,39 @@ func TestSkipChars(t *testing.T) {
 	}{
 		"hello world!": {
 			out:     "hello world!",
-			options: Options{skipChars: 1},
+			options: Options{SkipChars: 1},
 		},
 		"hello world!\nhello world!": {
 			out:     "hello world!",
-			options: Options{skipChars: 1},
+			options: Options{SkipChars: 1},
 		},
 		"hello world!\nhello world!\nhi": {
 			out:     "hello world!\nhi",
-			options: Options{skipChars: 5},
+			options: Options{SkipChars: 5},
 		},
 		"hello world!\n\n\nhello world!": {
 			out:     "hello world!\n\nhello world!",
-			options: Options{skipChars: 3},
+			options: Options{SkipChars: 3},
 		},
 		"kingsman\nwingsman": {
 			out:     "kingsman",
-			options: Options{skipChars: 5},
+			options: Options{SkipChars: 5},
 		},
 		"kingsman\nman": {
 			out:     "kingsman\nman",
-			options: Options{skipChars: 5},
+			options: Options{SkipChars: 5},
 		},
 		"kingsman\nhi\nwingsman\nkingsman": {
 			out:     "kingsman\nhi\nwingsman",
-			options: Options{skipChars: 5},
+			options: Options{SkipChars: 5},
 		},
 		"Привет мир!\nО нет, мир!": {
 			out:     "Привет мир!",
-			options: Options{skipChars: 6},
+			options: Options{SkipChars: 6},
 		},
 		"Привет мир!\nмир!": {
 			out:     "Привет мир!\nмир!",
-			options: Options{skipChars: 6},
+			options: Options{SkipChars: 6},
 		},
 	}
 
@@ -343,31 +343,31 @@ func TestSkipFieldsChars(t *testing.T) {
 	}{
 		"hello world!": {
 			out:     "hello world!",
-			options: Options{skipFields: 1, skipChars: 1},
+			options: Options{SkipFields: 1, SkipChars: 1},
 		},
 		"hello world!\nhello world!": {
 			out:     "hello world!",
-			options: Options{skipFields: 1, skipChars: 2},
+			options: Options{SkipFields: 1, SkipChars: 2},
 		},
 		"hello world!\nhello world!\nhi": {
 			out:     "hello world!\nhi",
-			options: Options{skipFields: 1, skipChars: 5},
+			options: Options{SkipFields: 1, SkipChars: 5},
 		},
 		"hello world!\n\n\nhello world!": {
 			out:     "hello world!\n\nhello world!",
-			options: Options{skipFields: 1, skipChars: 3},
+			options: Options{SkipFields: 1, SkipChars: 3},
 		},
 		"hello world!\n\nhello world!": {
 			out:     "hello world!",
-			options: Options{skipFields: 1, skipChars: 10},
+			options: Options{SkipFields: 1, SkipChars: 10},
 		},
 		"hello epicworld!\nhello damnworld!": {
 			out:     "hello epicworld!",
-			options: Options{skipFields: 1, skipChars: 5},
+			options: Options{SkipFields: 1, SkipChars: 5},
 		},
 		"Привет мир!\nмир!": {
 			out:     "Привет мир!\nмир!",
-			options: Options{skipFields: 1, skipChars: 2},
+			options: Options{SkipFields: 1, SkipChars: 2},
 		},
 	}
 
@@ -387,7 +387,7 @@ func TestIgnoreCase(t *testing.T) {
 	}
 
 	for in, correctOut := range tests {
-		out, err := Uniq(parseString(in), Options{ignoreCase: true})
+		out, err := Uniq(parseString(in), Options{IgnoreCase: true})
 		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
 		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
 	}
