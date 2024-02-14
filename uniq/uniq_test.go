@@ -377,3 +377,18 @@ func TestSkipFieldsChars(t *testing.T) {
 		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
 	}
 }
+
+func TestIgnoreCase(t *testing.T) {
+	tests := map[string]string{
+		"hello world!": "hello world!",
+		"hello world!\nhelLo WorLd!\nhello world!": "hello world!",
+		"hello world!\nhEllO woRlD!\nhi":           "hello world!\nhi",
+		"hi\n\n\nHI":                               "hi\n\nHI",
+	}
+
+	for in, correctOut := range tests {
+		out, err := uniq(parseString(in), Options{ignoreCase: true})
+		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
+		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+	}
+}

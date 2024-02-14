@@ -54,6 +54,9 @@ func getPartToCompare(currentLine string, options Options) (partToCompare string
 		partToCompare = ""
 	} else {
 		partToCompare = string([]rune(partToCompare)[options.skipChars:])
+		if options.ignoreCase {
+			partToCompare = strings.ToLower(partToCompare)
+		}
 	}
 
 	return
@@ -71,7 +74,7 @@ func uniq(input []string, options Options) (string, error) {
 
 	for i, currentLine := range input {
 		var partToCompare string = currentLine
-		if options.skipFields > 0 || options.skipChars > 0 {
+		if options.skipFields > 0 || options.skipChars > 0 || options.ignoreCase {
 			partToCompare = getPartToCompare(currentLine, options)
 			if i == 0 {
 				prevPartToCompare = partToCompare
