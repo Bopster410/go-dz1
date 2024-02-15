@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"flag"
-	"fmt"
 	"os"
 
 	"github.com/Bopster410/go-dz1/uniq"
@@ -19,12 +18,34 @@ func main() {
 	flag.BoolVar(&options.IgnoreCase, "i", false, "ignore case")
 	flag.Parse()
 
+	args := flag.Args()
+
+	// Default input - stdin
+	in := os.Stdin
+	if len(args) > 0 {
+		in, _ = os.Open(args[0])
+	}
+	// Scan input file (or stdin)
+	inScanner := bufio.NewScanner(in)
 	var text []string
-	in := bufio.NewScanner(os.Stdin)
-	for in.Scan() {
-		text = append(text, in.Text())
+	for inScanner.Scan() {
+		text = append(text, inScanner.Text())
 	}
 
+	// Default output - stdout
+	out := os.Stdout
+	if len(args) > 0 {
+		in.Close()
+		if len(args) == 2 {
+			out, _ = os.OpenFile(args[1], os.O_WRONLY|os.O_CREATE, 0222)
+		}
+	}
+
+	// Get output from uniq function
 	output, _ := uniq.Uniq(text, options)
-	fmt.Println(output)
+	// Write output to output file (or stdout)
+	out.Write([]byte(output))
+	if len(args) == 2 {
+		out.Close()
+	}
 }
