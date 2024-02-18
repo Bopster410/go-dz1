@@ -14,7 +14,8 @@ func TestSumBasic(t *testing.T) {
 		"1+2":       3,
 	}
 	for in, out := range tests {
-		require.Equal(t, out, CalcExpr(in))
+		expr := ParseExpr(in)
+		require.Equal(t, out, expr.CalcExpr(in))
 	}
 }
 
@@ -26,7 +27,8 @@ func TestSubstractBasic(t *testing.T) {
 		"2   - 1": 1,
 	}
 	for in, out := range tests {
-		require.Equal(t, out, CalcExpr(in))
+		expr := ParseExpr(in)
+		require.Equal(t, out, expr.CalcExpr(in))
 	}
 }
 
@@ -38,7 +40,8 @@ func TestMultiplyBasic(t *testing.T) {
 		"2   *  3": 6,
 	}
 	for in, out := range tests {
-		require.Equal(t, out, CalcExpr(in))
+		expr := ParseExpr(in)
+		require.Equal(t, out, expr.CalcExpr(in))
 	}
 }
 
@@ -50,6 +53,7 @@ func TestDivisionBasic(t *testing.T) {
 		"6   /  2": 3,
 	}
 	for in, out := range tests {
-		require.Equal(t, out, CalcExpr(in))
+		expr := ParseExpr(in)
+		require.Equal(t, out, expr.CalcExpr(in))
 	}
 }

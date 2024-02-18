@@ -11,9 +11,7 @@ type Expr struct {
 	action rune
 }
 
-func CalcExpr(expr string) int {
-	var exprStruct Expr
-	// Regex for numerical expressions
+func ParseExpr(expr string) (exprStruct Expr) {
 	re := regexp.MustCompile(`([1-9])\s*([+\-\/*])\s*([1-9])`)
 	for _, item := range re.FindStringSubmatch(expr)[1:] {
 		if item == "+" || item == "-" || item == "*" || item == "/" {
@@ -24,7 +22,11 @@ func CalcExpr(expr string) int {
 			exprStruct.right, _ = strconv.Atoi(item)
 		}
 	}
+	return
+}
 
+func (exprStruct Expr) CalcExpr(expr string) int {
+	// Regex for numerical expressions
 	var answer int
 	switch exprStruct.action {
 	case '+':
