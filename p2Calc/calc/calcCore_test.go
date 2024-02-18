@@ -11,6 +11,7 @@ func TestSumBasic(t *testing.T) {
 		"1 + 1":     2,
 		"1 + 2":     3,
 		"1    +  2": 3,
+		"1+2":       3,
 	}
 	for in, out := range tests {
 		require.Equal(t, out, CalcExpr(in))
@@ -19,8 +20,10 @@ func TestSumBasic(t *testing.T) {
 
 func TestSubstractBasic(t *testing.T) {
 	tests := map[string]int{
-		"1 - 1": 2,
-		"2 - 1": 3,
+		"1 - 1":   0,
+		"2 - 1":   1,
+		"2-1":     1,
+		"2   - 1": 1,
 	}
 	for in, out := range tests {
 		require.Equal(t, out, CalcExpr(in))
@@ -29,8 +32,10 @@ func TestSubstractBasic(t *testing.T) {
 
 func TestMultiplyBasic(t *testing.T) {
 	tests := map[string]int{
-		"1 * 1": 1,
-		"2 * 3": 6,
+		"1 * 1":    1,
+		"2 * 3":    6,
+		"2*3":      6,
+		"2   *  3": 6,
 	}
 	for in, out := range tests {
 		require.Equal(t, out, CalcExpr(in))
@@ -39,8 +44,10 @@ func TestMultiplyBasic(t *testing.T) {
 
 func TestDivisionBasic(t *testing.T) {
 	tests := map[string]int{
-		"1 / 1": 1,
-		"6 / 2": 3,
+		"1 / 1":    1,
+		"6 / 2":    3,
+		"6/2":      3,
+		"6   /  2": 3,
 	}
 	for in, out := range tests {
 		require.Equal(t, out, CalcExpr(in))
