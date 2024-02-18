@@ -5,9 +5,21 @@ import (
 	"strconv"
 )
 
+type ExprPart interface {
+	CalcExpr() int
+}
+
+type Num struct {
+	value int
+}
+
+func (num Num) CalcExpr() int {
+	return num.value
+}
+
 type Expr struct {
-	left   int
-	right  int
+	left   ExprPart
+	right  ExprPart
 	action rune
 }
 
@@ -17,26 +29,28 @@ func ParseExpr(expr string) (exprStruct Expr) {
 		if item == "+" || item == "-" || item == "*" || item == "/" {
 			exprStruct.action = rune(item[0])
 		} else if exprStruct.action == '\x00' {
-			exprStruct.left, _ = strconv.Atoi(item)
+			left, _ := strconv.Atoi(item)
+			exprStruct.left = Num{value: left}
 		} else {
-			exprStruct.right, _ = strconv.Atoi(item)
+			right, _ := strconv.Atoi(item)
+			exprStruct.right = Num{value: right}
 		}
 	}
 	return
 }
 
-func (exprStruct Expr) CalcExpr(expr string) int {
+func (exprStruct Expr) CalcExpr() int {
 	// Regex for numerical expressions
 	var answer int
 	switch exprStruct.action {
 	case '+':
-		answer = exprStruct.left + exprStruct.right
+		answer = exprStruct.left.CalcExpr() + exprStruct.right.CalcExpr()
 	case '-':
-		answer = exprStruct.left - exprStruct.right
+		answer = exprStruct.left.CalcExpr() - exprStruct.right.CalcExpr()
 	case '*':
-		answer = exprStruct.left * exprStruct.right
+		answer = exprStruct.left.CalcExpr() * exprStruct.right.CalcExpr()
 	case '/':
-		answer = exprStruct.left / exprStruct.right
+		answer = exprStruct.left.CalcExpr() / exprStruct.right.CalcExpr()
 	}
 
 	return answer
