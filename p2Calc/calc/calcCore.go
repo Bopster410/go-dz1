@@ -9,6 +9,7 @@ type ExprPart interface {
 	CalcExpr() int
 }
 
+// ----Num----
 type Num struct {
 	value int
 }
@@ -17,18 +18,37 @@ func (num Num) CalcExpr() int {
 	return num.value
 }
 
+// ----Expr----
 type Expr struct {
 	left   ExprPart
 	right  ExprPart
-	action rune
+	action int
+}
+
+// Action flags
+const (
+	NONE = iota
+	ADD  = iota
+	SUB  = iota
+	MUL  = iota
+	DIV  = iota
+)
+
+var ACTION = map[string]int{
+	"+": ADD,
+	"-": SUB,
+	"*": MUL,
+	"/": DIV,
 }
 
 func ParseExpr(expr string) (exprStruct Expr) {
 	re := regexp.MustCompile(`([1-9])\s*([+\-\/*])\s*([1-9])`)
+	exprStruct.action = NONE
 	for _, item := range re.FindStringSubmatch(expr)[1:] {
-		if item == "+" || item == "-" || item == "*" || item == "/" {
-			exprStruct.action = rune(item[0])
-		} else if exprStruct.action == '\x00' {
+		_, isAction := ACTION[item]
+		if isAction {
+			exprStruct.action = ACTION[item]
+		} else if exprStruct.action == NONE {
 			left, _ := strconv.Atoi(item)
 			exprStruct.left = Num{value: left}
 		} else {
@@ -43,13 +63,13 @@ func (exprStruct Expr) CalcExpr() int {
 	// Regex for numerical expressions
 	var answer int
 	switch exprStruct.action {
-	case '+':
+	case ADD:
 		answer = exprStruct.left.CalcExpr() + exprStruct.right.CalcExpr()
-	case '-':
+	case SUB:
 		answer = exprStruct.left.CalcExpr() - exprStruct.right.CalcExpr()
-	case '*':
+	case MUL:
 		answer = exprStruct.left.CalcExpr() * exprStruct.right.CalcExpr()
-	case '/':
+	case DIV:
 		answer = exprStruct.left.CalcExpr() / exprStruct.right.CalcExpr()
 	}
 
