@@ -5,7 +5,7 @@ import (
 	"flag"
 	"os"
 
-	"github.com/Bopster410/go-dz1/p1Uniq/uniq"
+	"github.com/Bopster410/go-dz1/uniq"
 )
 
 func main() {
