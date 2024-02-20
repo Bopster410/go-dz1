@@ -42,18 +42,26 @@ var ACTION = map[string]int{
 }
 
 func ParseExpr(expr string) (exprStruct Expr) {
-	re := regexp.MustCompile(`([1-9])\s*([+\-\/*])\s*([1-9])`)
+	re := regexp.MustCompile(`([1-9]|\(.*\))\s*([+\-\/*])\s*([1-9]|\(.*\))`)
 	exprStruct.action = NONE
 	for _, item := range re.FindStringSubmatch(expr)[1:] {
 		_, isAction := ACTION[item]
 		if isAction {
 			exprStruct.action = ACTION[item]
 		} else if exprStruct.action == NONE {
-			left, _ := strconv.Atoi(item)
-			exprStruct.left = Num{value: left}
+			left, err := strconv.Atoi(item)
+			if err == nil {
+				exprStruct.left = Num{value: left}
+			} else {
+				exprStruct.left = ParseExpr(item)
+			}
 		} else {
-			right, _ := strconv.Atoi(item)
-			exprStruct.right = Num{value: right}
+			right, err := strconv.Atoi(item)
+			if err == nil {
+				exprStruct.right = Num{value: right}
+			} else {
+				exprStruct.right = ParseExpr(item)
+			}
 		}
 	}
 	return

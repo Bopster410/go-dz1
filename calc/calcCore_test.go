@@ -57,3 +57,14 @@ func TestDivisionBasic(t *testing.T) {
 		require.Equal(t, out, expr.CalcExpr())
 	}
 }
+
+func TestComplex(t *testing.T) {
+	tests := map[string]int{
+		"(1 + 1) * 2": 4,
+		"2 * (1 + 1)": 4,
+	}
+	for in, out := range tests {
+		expr := ParseExpr(in)
+		require.Equal(t, out, expr.CalcExpr())
+	}
+}
