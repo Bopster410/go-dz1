@@ -3,6 +3,7 @@ package calc
 import (
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 type ExprPart interface {
@@ -41,30 +42,51 @@ var ACTION = map[string]int{
 	"/": DIV,
 }
 
-func ParseExpr(expr string) (exprStruct Expr) {
-	re := regexp.MustCompile(`([1-9]|\(.*\))\s*([+\-\/*])\s*([1-9]|\(.*\))`)
-	exprStruct.action = NONE
-	for _, item := range re.FindStringSubmatch(expr)[1:] {
-		_, isAction := ACTION[item]
-		if isAction {
-			exprStruct.action = ACTION[item]
-		} else if exprStruct.action == NONE {
-			left, err := strconv.Atoi(item)
-			if err == nil {
-				exprStruct.left = Num{value: left}
-			} else {
-				exprStruct.left = ParseExpr(item)
+func trimParentheses(line string) string {
+	if !strings.HasPrefix(line, "(") || !strings.HasSuffix(line, ")") {
+		return line
+	}
+
+	var open, close int
+	for ind, symb := range line {
+		if symb == '(' {
+			open++
+		} else if symb == ')' {
+			close++
+		}
+
+		if open == close {
+			if ind != len(line)-1 {
+				return line
 			}
-		} else {
-			right, err := strconv.Atoi(item)
+			return line[1:ind]
+		}
+	}
+	return line
+}
+
+func ParseExpr(expr string) ExprPart {
+	expr = trimParentheses(expr)
+	exprParts := regexp.MustCompile(`^(.*\(.*\)[^(]*?|[^)(]+?)\s*([+-])\s*(.*)`).FindStringSubmatch(expr)
+	if len(exprParts) == 0 {
+		exprParts = regexp.MustCompile(`^(.*?\(.*\)[^(]*?|[^)(]+?)\s*([*/])\s*(.*)`).FindStringSubmatch(expr)
+		if len(exprParts) == 0 {
+			num, err := strconv.Atoi(regexp.MustCompile(`\d+`).FindString(expr))
 			if err == nil {
-				exprStruct.right = Num{value: right}
-			} else {
-				exprStruct.right = ParseExpr(item)
+				return Num{value: num}
 			}
 		}
 	}
-	return
+
+	if len(exprParts) > 0 {
+		var exprStruct Expr
+		exprStruct.left = ParseExpr(exprParts[1])
+		exprStruct.action = ACTION[exprParts[2]]
+		exprStruct.right = ParseExpr(exprParts[3])
+		return exprStruct
+	}
+
+	return nil
 }
 
 func (exprStruct Expr) CalcExpr() int {

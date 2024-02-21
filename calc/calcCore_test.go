@@ -60,8 +60,11 @@ func TestDivisionBasic(t *testing.T) {
 
 func TestComplex(t *testing.T) {
 	tests := map[string]int{
-		"(1 + 1) * 2": 4,
-		"2 * (1 + 1)": 4,
+		"(1 + 1) * 2":     4,
+		"2 * (1 + 1)":     4,
+		"1 + 3 + 8 - 4":   8,
+		"1 + 3 + 8 * 4":   36,
+		"(1 + 3) * 8 - 4": 28,
 	}
 	for in, out := range tests {
 		expr := ParseExpr(in)
