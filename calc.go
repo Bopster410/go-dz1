@@ -8,6 +8,11 @@ import (
 )
 
 func main() {
+	if len(os.Args) != 1 {
+		fmt.Println("Wrong input format")
+		return
+	}
+
 	exprStr := os.Args[1]
 	expr, parseErr := calc.ParseExpr(exprStr)
 	if parseErr != nil {
