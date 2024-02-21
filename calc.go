@@ -9,6 +9,16 @@ import (
 
 func main() {
 	exprStr := os.Args[1]
-	expr := calc.ParseExpr(exprStr)
-	fmt.Printf("%d", expr.CalcExpr())
+	expr, parseErr := calc.ParseExpr(exprStr)
+	if parseErr != nil {
+		fmt.Printf("An error occurred while parsing the expression: %q", parseErr)
+	} else {
+		val, calcErr := expr.CalcExpr()
+		if calcErr != nil {
+			fmt.Printf("An error occurred during the calculation: %q", calcErr)
+		} else {
+			fmt.Printf("%d", val)
+		}
+	}
+
 }
