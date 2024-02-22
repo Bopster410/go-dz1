@@ -16,6 +16,7 @@ type Options struct {
 	IgnoreCase bool // -i
 }
 
+// Formats given line in accordance with options
 func processLine(line string, Counter int, options Options) (processed string, err error) {
 	// If -d flag or -u flag
 	if (options.Repeated && Counter > 1 || !options.Repeated) && (options.Unique && Counter == 1 || !options.Unique) {
@@ -31,6 +32,7 @@ func processLine(line string, Counter int, options Options) (processed string, e
 	return
 }
 
+// Returns part which then will be used to compare lines (in accordance with options)
 func getPartToCompare(currentLine string, options Options) (partToCompare string) {
 	skippedFields := 0
 	wasSkipped := false
@@ -62,17 +64,22 @@ func getPartToCompare(currentLine string, options Options) (partToCompare string
 	return
 }
 
+// Unig main function
 func Uniq(input []string, options Options) (string, error) {
+	// checks options
 	if options.Unique && options.Repeated || options.Unique && options.Count || options.Repeated && options.Unique {
 		return "", fmt.Errorf("-u, -d, -c flags can't be used simultaneously")
 	}
 
+	// initial values
 	var outputSlice []string
 	var prevLine string = input[0]
 	var prevPartToCompare = prevLine
-	var Counter int = 0
+	var counter int = 0
 
+	// iterate through all lines
 	for i, currentLine := range input {
+		// get part to use to compare lines
 		var partToCompare string = currentLine
 		if options.SkipFields > 0 || options.SkipChars > 0 || options.IgnoreCase {
 			partToCompare = getPartToCompare(currentLine, options)
@@ -81,21 +88,22 @@ func Uniq(input []string, options Options) (string, error) {
 			}
 		}
 
+		// line is unique
 		if partToCompare != prevPartToCompare {
-			processed, err := processLine(prevLine, Counter, options)
+			processed, err := processLine(prevLine, counter, options)
 			if err == nil {
 				outputSlice = append(outputSlice, processed)
 			}
 
 			prevLine = currentLine
 			prevPartToCompare = partToCompare
-			Counter = 1
+			counter = 1
 		} else {
-			Counter++
+			counter++
 		}
 	}
 
-	processed, err := processLine(prevLine, Counter, options)
+	processed, err := processLine(prevLine, counter, options)
 	if err == nil {
 		outputSlice = append(outputSlice, processed)
 	}
@@ -103,6 +111,7 @@ func Uniq(input []string, options Options) (string, error) {
 	return strings.Join(outputSlice, "\n"), nil
 }
 
+// Separates lines
 func parseString(input string) (output []string) {
 	scanner := bufio.NewScanner(strings.NewReader(input))
 	for scanner.Scan() {
