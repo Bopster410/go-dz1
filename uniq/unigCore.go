@@ -67,7 +67,7 @@ func getPartToCompare(currentLine string, options Options) (partToCompare string
 // Unig main function
 func Uniq(input []string, options Options) (string, error) {
 	// checks options
-	if options.Unique && options.Repeated || options.Unique && options.Count || options.Repeated && options.Unique {
+	if !CheckOptions(options) {
 		return "", fmt.Errorf("-u, -d, -c flags can't be used simultaneously")
 	}
 
@@ -119,4 +119,16 @@ func parseString(input string) (output []string) {
 		output = append(output, currentLine)
 	}
 	return
+}
+
+// Checks if Count, Repeated and Unique options are not used at the same time
+func CheckOptions(options Options) bool {
+	optionsToCheck := [3]bool{options.Count, options.Repeated, options.Unique}
+	var counter int
+	for _, option := range optionsToCheck {
+		if option {
+			counter++
+		}
+	}
+	return counter <= 1
 }
