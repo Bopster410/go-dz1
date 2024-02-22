@@ -7,11 +7,13 @@ import (
 	"strings"
 )
 
+// Represents structures that can be placed into the math expression
 type ExprPart interface {
 	CalcExpr() (int, error)
 }
 
 // ----Num----
+// represents a single number, e.g. 1, 10, 32323
 type Num struct {
 	value int
 }
@@ -21,21 +23,22 @@ func (num Num) CalcExpr() (int, error) {
 }
 
 // ----Expr----
+// represents a math expression, e.g. (12 + 33) * 2 - 10
 type Expr struct {
 	left   ExprPart
 	right  ExprPart
 	action int
 }
 
-// Action flags
 const (
-	NONE = iota
-	ADD  = iota
-	SUB  = iota
-	MUL  = iota
-	DIV  = iota
+	NONE = iota // action is not assigned
+	ADD  = iota // '+'
+	SUB  = iota // '-'
+	MUL  = iota // '*'
+	DIV  = iota // '/'
 )
 
+// map for convenience
 var ACTION = map[string]int{
 	"+": ADD,
 	"-": SUB,
@@ -43,57 +46,7 @@ var ACTION = map[string]int{
 	"/": DIV,
 }
 
-func trimParentheses(line string) string {
-	if !strings.HasPrefix(line, "(") || !strings.HasSuffix(line, ")") {
-		return line
-	}
-
-	var open, close int
-	for ind, symb := range line {
-		if symb == '(' {
-			open++
-		} else if symb == ')' {
-			close++
-		}
-
-		if open == close {
-			if ind != len(line)-1 {
-				return line
-			}
-			return line[1:ind]
-		}
-	}
-	return line
-}
-
-func ParseExpr(expr string) (ExprPart, error) {
-	expr = trimParentheses(expr)
-	exprParts := regexp.MustCompile(`^(.*\(.*\)[^(]*?|[^)(]+?)\s*([+-])\s*(.*)`).FindStringSubmatch(expr)
-	if len(exprParts) == 0 {
-		exprParts = regexp.MustCompile(`^(.*?\(.*\)[^(]*?|[^)(]+?)\s*([*/])\s*(.*)`).FindStringSubmatch(expr)
-		if len(exprParts) == 0 {
-			num, err := strconv.Atoi(expr)
-			if err == nil {
-				return Num{value: num}, nil
-			}
-		}
-	}
-
-	if len(exprParts) > 0 {
-		var exprStruct Expr
-		exprStruct.left, _ = ParseExpr(exprParts[1])
-		exprStruct.action = ACTION[exprParts[2]]
-		exprStruct.right, _ = ParseExpr(exprParts[3])
-		if exprStruct.left != nil && exprStruct.right != nil {
-			return exprStruct, nil
-		}
-	}
-
-	return nil, fmt.Errorf("wrong expression syntax")
-}
-
 func (exprStruct Expr) CalcExpr() (int, error) {
-	// Regex for numerical expressions
 	var answer int
 	leftVal, leftErr := exprStruct.left.CalcExpr()
 	rightVal, rightErr := exprStruct.right.CalcExpr()
@@ -119,4 +72,60 @@ func (exprStruct Expr) CalcExpr() (int, error) {
 	}
 
 	return answer, nil
+}
+
+// ----Other functoins----
+// Removes outer parentheses if needed
+func trimParentheses(line string) string {
+	if !strings.HasPrefix(line, "(") || !strings.HasSuffix(line, ")") {
+		return line
+	}
+
+	var open, close int
+	for ind, symb := range line {
+		if symb == '(' {
+			open++
+		} else if symb == ')' {
+			close++
+		}
+
+		if open == close {
+			if ind != len(line)-1 {
+				return line
+			}
+			return line[1:ind]
+		}
+	}
+	return line
+}
+
+// Parses input string into Expr structure
+func ParseExpr(expr string) (ExprPart, error) {
+	expr = trimParentheses(expr)
+	// search for sum (substraction) parts
+	exprParts := regexp.MustCompile(`^(.*\(.*\)[^(]*?|[^)(]+?)\s*([+-])\s*(.*)`).FindStringSubmatch(expr)
+	if len(exprParts) == 0 {
+		// if nothing was found, search for multiplication (division) parts
+		exprParts = regexp.MustCompile(`^(.*?\(.*\)[^(]*?|[^)(]+?)\s*([*/])\s*(.*)`).FindStringSubmatch(expr)
+		if len(exprParts) == 0 {
+			// if nothing was found convert to int and return Num
+			num, err := strconv.Atoi(expr)
+			if err == nil {
+				return Num{value: num}, nil
+			}
+		}
+	}
+
+	// parse found parts into the Expr
+	if len(exprParts) > 0 {
+		var exprStruct Expr
+		exprStruct.left, _ = ParseExpr(exprParts[1])
+		exprStruct.action = ACTION[exprParts[2]]
+		exprStruct.right, _ = ParseExpr(exprParts[3])
+		if exprStruct.left != nil && exprStruct.right != nil {
+			return exprStruct, nil
+		}
+	}
+
+	return nil, fmt.Errorf("wrong expression syntax")
 }
