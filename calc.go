@@ -24,13 +24,14 @@ func main() {
 	expr, parseErr := calc.ParseExpr(exprStr)
 	if parseErr != nil {
 		fmt.Printf("An error occurred while parsing the expression: %q", parseErr)
+		return
+	}
+
+	val, calcErr := expr.CalcExpr()
+	if calcErr != nil {
+		fmt.Printf("An error occurred during the calculation: %q", calcErr)
 	} else {
-		val, calcErr := expr.CalcExpr()
-		if calcErr != nil {
-			fmt.Printf("An error occurred during the calculation: %q", calcErr)
-		} else {
-			fmt.Printf("%d", val)
-		}
+		fmt.Printf("%d", val)
 	}
 
 }
