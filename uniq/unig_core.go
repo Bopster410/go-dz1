@@ -17,16 +17,16 @@ type Options struct {
 }
 
 // Formats given line in accordance with options
-func processLine(line string, Counter int, options Options) (processed string, err error) {
+func processLine(line string, counter int, options Options) (processed string, err error) {
 	// If -d flag or -u flag
-	if (options.Repeated && Counter > 1 || !options.Repeated) && (options.Unique && Counter == 1 || !options.Unique) {
+	if options.Repeated && counter <= 1 || options.Unique && counter != 1 {
+		err = fmt.Errorf("current line doesn't meet the requirements")
+	} else {
 		processed = line
 		// If -c flag
 		if options.Count {
-			processed = fmt.Sprintf("%d %v", Counter, line)
+			processed = fmt.Sprintf("%d %v", counter, line)
 		}
-	} else {
-		err = fmt.Errorf("current line doesn't meet the requirements")
 	}
 
 	return
@@ -56,9 +56,6 @@ func getPartToCompare(currentLine string, options Options) (partToCompare string
 		partToCompare = ""
 	} else {
 		partToCompare = string([]rune(partToCompare)[options.SkipChars:])
-		if options.IgnoreCase {
-			partToCompare = strings.ToLower(partToCompare)
-		}
 	}
 
 	return
@@ -89,7 +86,14 @@ func Uniq(input []string, options Options) (string, error) {
 		}
 
 		// line is unique
-		if partToCompare != prevPartToCompare {
+		equal := false
+		if options.IgnoreCase {
+			equal = strings.EqualFold(partToCompare, prevPartToCompare)
+		} else {
+			equal = partToCompare == prevPartToCompare
+		}
+
+		if !equal {
 			processed, err := processLine(prevLine, counter, options)
 			if err == nil {
 				outputSlice = append(outputSlice, processed)
