@@ -1,6 +1,7 @@
 package uniq
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -16,9 +17,14 @@ func TestNoFlags(t *testing.T) {
 	}
 
 	for in, correctOut := range tests {
-		out, err := Uniq(parseString(in), Options{})
-		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
-		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		in := in
+		correctOut := correctOut
+		t.Run(fmt.Sprintf("Test %q", in), func(t *testing.T) {
+			t.Parallel()
+			out, err := Uniq(parseString(in), Options{})
+			require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
+			require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		})
 	}
 }
 
@@ -32,9 +38,14 @@ func TestCount(t *testing.T) {
 	}
 
 	for in, correctOut := range tests {
-		out, err := Uniq(parseString(in), Options{Count: true})
-		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
-		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		in := in
+		correctOut := correctOut
+		t.Run(fmt.Sprintf("Test %q", in), func(t *testing.T) {
+			t.Parallel()
+			out, err := Uniq(parseString(in), Options{Count: true})
+			require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
+			require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		})
 	}
 }
 
@@ -48,9 +59,14 @@ func TestRepeated(t *testing.T) {
 	}
 
 	for in, correctOut := range tests {
-		out, err := Uniq(parseString(in), Options{Repeated: true})
-		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
-		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		in := in
+		correctOut := correctOut
+		t.Run(fmt.Sprintf("Test %q", in), func(t *testing.T) {
+			t.Parallel()
+			out, err := Uniq(parseString(in), Options{Repeated: true})
+			require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
+			require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		})
 	}
 }
 
@@ -64,9 +80,14 @@ func TestUnique(t *testing.T) {
 	}
 
 	for in, correctOut := range tests {
-		out, err := Uniq(parseString(in), Options{Unique: true})
-		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
-		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		in := in
+		correctOut := correctOut
+		t.Run(fmt.Sprintf("Test %q", in), func(t *testing.T) {
+			t.Parallel()
+			out, err := Uniq(parseString(in), Options{Unique: true})
+			require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
+			require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		})
 	}
 }
 
@@ -80,9 +101,13 @@ func TestNoParallelFlags(t *testing.T) {
 	}
 
 	for _, in := range tests {
-		out, err := Uniq(parseString(in), Options{Unique: true, Repeated: true, Count: true})
-		require.Equalf(t, "", out, "Strings don't match!\ntest string - '%v'", in)
-		require.NotEqualf(t, err, nil, "Must be an error!\ntest string - '%v'", in)
+		in := in
+		t.Run(fmt.Sprintf("Test %q", in), func(t *testing.T) {
+			t.Parallel()
+			out, err := Uniq(parseString(in), Options{Unique: true, Repeated: true, Count: true})
+			require.Equalf(t, "", out, "Strings don't match!\ntest string - '%v'", in)
+			require.NotEqualf(t, err, nil, "Must be an error!\ntest string - '%v'", in)
+		})
 	}
 }
 
@@ -130,9 +155,14 @@ func TestSkipFields(t *testing.T) {
 	}
 
 	for in, testParams := range tests {
-		out, err := Uniq(parseString(in), testParams.options)
-		require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
-		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		in := in
+		testParams := testParams
+		t.Run(fmt.Sprintf("Test %q", in), func(t *testing.T) {
+			t.Parallel()
+			out, err := Uniq(parseString(in), testParams.options)
+			require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
+			require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		})
 	}
 }
 
@@ -180,9 +210,14 @@ func TestSkipFieldsCount(t *testing.T) {
 	}
 
 	for in, testParams := range tests {
-		out, err := Uniq(parseString(in), testParams.options)
-		require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
-		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		in := in
+		testParams := testParams
+		t.Run(fmt.Sprintf("Test %q", in), func(t *testing.T) {
+			t.Parallel()
+			out, err := Uniq(parseString(in), testParams.options)
+			require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
+			require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		})
 	}
 }
 
@@ -230,9 +265,14 @@ func TestSkipFieldsUnique(t *testing.T) {
 	}
 
 	for in, testParams := range tests {
-		out, err := Uniq(parseString(in), testParams.options)
-		require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
-		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		in := in
+		testParams := testParams
+		t.Run(fmt.Sprintf("Test %q", in), func(t *testing.T) {
+			t.Parallel()
+			out, err := Uniq(parseString(in), testParams.options)
+			require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
+			require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		})
 	}
 }
 
@@ -280,9 +320,14 @@ func TestSkipFieldsRepeated(t *testing.T) {
 	}
 
 	for in, testParams := range tests {
-		out, err := Uniq(parseString(in), testParams.options)
-		require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
-		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		in := in
+		testParams := testParams
+		t.Run(fmt.Sprintf("Test %q", in), func(t *testing.T) {
+			t.Parallel()
+			out, err := Uniq(parseString(in), testParams.options)
+			require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
+			require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		})
 	}
 }
 
@@ -330,9 +375,14 @@ func TestSkipChars(t *testing.T) {
 	}
 
 	for in, testParams := range tests {
-		out, err := Uniq(parseString(in), testParams.options)
-		require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
-		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		in := in
+		testParams := testParams
+		t.Run(fmt.Sprintf("Test %q", in), func(t *testing.T) {
+			t.Parallel()
+			out, err := Uniq(parseString(in), testParams.options)
+			require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
+			require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		})
 	}
 }
 
@@ -372,9 +422,14 @@ func TestSkipFieldsChars(t *testing.T) {
 	}
 
 	for in, testParams := range tests {
-		out, err := Uniq(parseString(in), testParams.options)
-		require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
-		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		in := in
+		testParams := testParams
+		t.Run(fmt.Sprintf("Test %q", in), func(t *testing.T) {
+			t.Parallel()
+			out, err := Uniq(parseString(in), testParams.options)
+			require.Equalf(t, testParams.out, out, "Strings don't match!\ntest string - '%v'", in)
+			require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		})
 	}
 }
 
@@ -387,8 +442,13 @@ func TestIgnoreCase(t *testing.T) {
 	}
 
 	for in, correctOut := range tests {
-		out, err := Uniq(parseString(in), Options{IgnoreCase: true})
-		require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
-		require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		in := in
+		correctOut := correctOut
+		t.Run(fmt.Sprintf("Test %q", in), func(t *testing.T) {
+			t.Parallel()
+			out, err := Uniq(parseString(in), Options{IgnoreCase: true})
+			require.Equalf(t, correctOut, out, "Strings don't match!\ntest string - '%v'", in)
+			require.Equalf(t, err, nil, "Error occurred: %v\ntest string - '%v'", err, in)
+		})
 	}
 }
