@@ -9,16 +9,16 @@ import (
 
 // Represents structures that can be placed into the math expression
 type ExprPart interface {
-	CalcExpr() (int, error)
+	CalcExpr() (float64, error)
 }
 
 // ----Num----
 // represents a single number, e.g. 1, 10, 32323
 type Num struct {
-	value int
+	value float64
 }
 
-func (num Num) CalcExpr() (int, error) {
+func (num Num) CalcExpr() (float64, error) {
 	return num.value, nil
 }
 
@@ -46,8 +46,8 @@ var ACTION = map[string]int{
 	"/": DIV,
 }
 
-func (exprStruct Expr) CalcExpr() (int, error) {
-	var answer int
+func (exprStruct Expr) CalcExpr() (float64, error) {
+	var answer float64
 	leftVal, leftErr := exprStruct.left.CalcExpr()
 	rightVal, rightErr := exprStruct.right.CalcExpr()
 	if leftErr != nil {
@@ -109,7 +109,7 @@ func ParseExpr(expr string) (ExprPart, error) {
 		exprParts = regexp.MustCompile(`^(.*?\(.*\)[^(]*?|[^)(]+?)\s*([*/])\s*(.*)`).FindStringSubmatch(expr)
 		if len(exprParts) == 0 {
 			// if nothing was found convert to int and return Num
-			num, err := strconv.Atoi(expr)
+			num, err := strconv.ParseFloat(expr, 32)
 			if err == nil {
 				return Num{value: num}, nil
 			}

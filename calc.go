@@ -33,5 +33,5 @@ func main() {
 		return
 	}
 
-	fmt.Printf("%d\n", val)
+	fmt.Printf("%.2f\n", val)
 }
