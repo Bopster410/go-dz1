@@ -30,8 +30,8 @@ func main() {
 	val, calcErr := expr.CalcExpr()
 	if calcErr != nil {
 		fmt.Printf("An error occurred during the calculation: %q", calcErr)
-	} else {
-		fmt.Printf("%d", val)
+		return
 	}
 
+	fmt.Printf("%d", val)
 }
