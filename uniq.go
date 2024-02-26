@@ -9,8 +9,14 @@ import (
 	"github.com/Bopster410/go-dz1/uniq"
 )
 
-func main() {
-	const HELP_MSG string = `Usage: uniq [-c | -d | -u] [-i] [-f num] [-s chars] [input_file [output_file]]
+type Input struct {
+	text           []string
+	options        uniq.Options
+	outputFileName string
+}
+
+func getInput() (Input, error) {
+	const HELP_MSG string = `usage: uniq [-c | -d | -u] [-i] [-f num] [-s chars] [input_file [output_file]]
 	Filter adjacent matching lines from input_file (or standard input),
 	writing to output_file (or standard output).
 
@@ -32,22 +38,23 @@ func main() {
 	flag.Parse()
 
 	if !uniq.CheckOptions(options) {
-		fmt.Println(HELP_MSG)
-		return
+		return Input{}, fmt.Errorf(HELP_MSG)
 	}
 
 	args := flag.Args()
 
 	// Default input - stdin
 	in := os.Stdin
+	fileInput := false
 	if len(args) > 0 {
 		var err error
 		in, err = os.Open(args[0])
 		if err != nil {
-			fmt.Printf("An error occurred while opening input file: %q\n", err)
-			return
+			return Input{}, fmt.Errorf("an error occurred while opening input file: %q", err)
 		}
+		fileInput = true
 	}
+
 	// Scan input file (or stdin)
 	inScanner := bufio.NewScanner(in)
 	var text []string
@@ -55,22 +62,43 @@ func main() {
 		text = append(text, inScanner.Text())
 	}
 
+	// Close input file
+	var closeErr error = nil
+	if fileInput {
+		closeErr = in.Close()
+	}
+
+	outputFileName := ""
+	if len(args) == 2 {
+		outputFileName = args[1]
+	}
+
+	return Input{text: text, options: options, outputFileName: outputFileName}, closeErr
+}
+
+func main() {
+	// User input
+	input, err := getInput()
+	if err != nil {
+		fmt.Printf("An error occurred: %q\n", err)
+		return
+	}
+
 	// Default output - stdout
 	out := os.Stdout
-	if len(args) > 0 {
-		in.Close()
-		if len(args) == 2 {
-			var err error
-			out, err = os.OpenFile(args[1], os.O_WRONLY|os.O_CREATE, 0222)
-			if err != nil {
-				fmt.Printf("An error occurred while opening the output file: %q\n", err)
-				return
-			}
+	fileOutput := false
+	if len(input.outputFileName) > 0 {
+		var err error
+		out, err = os.OpenFile(input.outputFileName, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0222)
+		if err != nil {
+			fmt.Printf("An error occurred while opening the output file: %q\n", err)
+			return
 		}
+		fileOutput = true
 	}
 
 	// Get output from uniq function
-	output, err := uniq.Uniq(text, options)
+	output, err := uniq.Uniq(input.text, input.options)
 	if err != nil {
 		fmt.Printf("An error occurred while uniq function work: %q\n", err)
 		return
@@ -78,7 +106,7 @@ func main() {
 
 	// Write output to output file (or stdout)
 	out.Write([]byte(output))
-	if len(args) == 2 {
+	if fileOutput {
 		out.Close()
 	}
 }
