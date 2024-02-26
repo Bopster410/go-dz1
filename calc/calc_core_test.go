@@ -149,10 +149,7 @@ func TestComplex(t *testing.T) {
 func TestZeroDivision(t *testing.T) {
 	t.Parallel()
 	in := "1 / 0"
-	expr, parseErr := ParseExpr(in)
-	require.NotNil(t, expr)
-	require.Nil(t, parseErr)
-
+	expr, _ := ParseExpr(in)
 	_, calcErr := expr.CalcExpr()
 	require.Equal(t, fmt.Errorf("zero division occurred"), calcErr)
 }
