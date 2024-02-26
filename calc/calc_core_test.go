@@ -8,7 +8,7 @@ import (
 )
 
 func TestSumBasic(t *testing.T) {
-	tests := map[string]int{
+	tests := map[string]float64{
 		"1 + 1":     2,
 		"1 + 2":     3,
 		"1    +  2": 3,
@@ -24,7 +24,7 @@ func TestSumBasic(t *testing.T) {
 }
 
 func TestSubstractBasic(t *testing.T) {
-	tests := map[string]int{
+	tests := map[string]float64{
 		"1 - 1":   0,
 		"2 - 1":   1,
 		"2-1":     1,
@@ -40,7 +40,7 @@ func TestSubstractBasic(t *testing.T) {
 }
 
 func TestMultiplyBasic(t *testing.T) {
-	tests := map[string]int{
+	tests := map[string]float64{
 		"1 * 1":    1,
 		"2 * 3":    6,
 		"2*3":      6,
@@ -56,7 +56,7 @@ func TestMultiplyBasic(t *testing.T) {
 }
 
 func TestDivisionBasic(t *testing.T) {
-	tests := map[string]int{
+	tests := map[string]float64{
 		"1 / 1":    1,
 		"6 / 2":    3,
 		"6/2":      3,
@@ -72,7 +72,7 @@ func TestDivisionBasic(t *testing.T) {
 }
 
 func TestComplex(t *testing.T) {
-	tests := map[string]int{
+	tests := map[string]float64{
 		"(1 + 1) * 2":     4,
 		"2 * (1 + 1)":     4,
 		"1 + 3 + 8 - 4":   8,
