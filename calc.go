@@ -7,13 +7,20 @@ import (
 	"github.com/Bopster410/go-dz1/calc"
 )
 
-func main() {
+func getInput() (string, error) {
 	if len(os.Args) != 2 {
-		fmt.Println("Wrong input format")
+		return "", fmt.Errorf("wrong input format")
+	}
+	return os.Args[1], nil
+}
+
+func main() {
+	exprStr, err := getInput()
+	if err != nil {
+		fmt.Printf("An error occurred: %q\n", err)
 		return
 	}
 
-	exprStr := os.Args[1]
 	expr, parseErr := calc.ParseExpr(exprStr)
 	if parseErr != nil {
 		fmt.Printf("An error occurred while parsing the expression: %q", parseErr)
