@@ -45,27 +45,24 @@ func getInput() (Input, error) {
 
 	// Default input - stdin
 	in := os.Stdin
-	fileInput := false
 	if len(args) > 0 {
 		var err error
 		in, err = os.Open(args[0])
+		defer in.Close()
 		if err != nil {
 			return Input{}, fmt.Errorf("an error occurred while opening input file: %q", err)
 		}
-		fileInput = true
 	}
 
 	// Scan input file (or stdin)
 	inScanner := bufio.NewScanner(in)
 	var text []string
 	for inScanner.Scan() {
+		err := inScanner.Err()
+		if err != nil {
+			return Input{}, fmt.Errorf("an error occurred during the scanner work: %q", err)
+		}
 		text = append(text, inScanner.Text())
-	}
-
-	// Close input file
-	var closeErr error = nil
-	if fileInput {
-		closeErr = in.Close()
 	}
 
 	outputFileName := ""
@@ -73,7 +70,7 @@ func getInput() (Input, error) {
 		outputFileName = args[1]
 	}
 
-	return Input{text: text, options: options, outputFileName: outputFileName}, closeErr
+	return Input{text: text, options: options, outputFileName: outputFileName}, nil
 }
 
 func main() {

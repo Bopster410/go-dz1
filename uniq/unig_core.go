@@ -17,11 +17,12 @@ type Options struct {
 }
 
 // Formats given line in accordance with options
-func processLine(line string, counter int, options Options) (processed string, err error) {
+func processLine(line string, counter int, options Options) (processed string, wasProcessed bool) {
 	// If -d flag or -u flag
 	if options.Repeated && counter <= 1 || options.Unique && counter != 1 {
-		err = fmt.Errorf("current line doesn't meet the requirements")
+		wasProcessed = false
 	} else {
+		wasProcessed = true
 		processed = line
 		// If -c flag
 		if options.Count {
@@ -94,8 +95,8 @@ func Uniq(input []string, options Options) (string, error) {
 		}
 
 		if !equal {
-			processed, err := processLine(prevLine, counter, options)
-			if err == nil {
+			processed, wasProcessed := processLine(prevLine, counter, options)
+			if wasProcessed {
 				outputSlice = append(outputSlice, processed)
 			}
 
@@ -107,8 +108,8 @@ func Uniq(input []string, options Options) (string, error) {
 		}
 	}
 
-	processed, err := processLine(prevLine, counter, options)
-	if err == nil {
+	processed, wasProcessed := processLine(prevLine, counter, options)
+	if wasProcessed {
 		outputSlice = append(outputSlice, processed)
 	}
 
