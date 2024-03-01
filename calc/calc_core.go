@@ -117,7 +117,7 @@ func ParseExpr(expr string) (ExprPart, error) {
 	}
 
 	// parse found parts into the Expr
-	if len(exprParts) > 0 {
+	if len(exprParts) == 3 {
 		var exprStruct Expr
 		exprStruct.left, _ = ParseExpr(exprParts[1])
 		exprStruct.action = ACTION[exprParts[2]]
