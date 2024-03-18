@@ -42,40 +42,16 @@ func SelectUsers(in, out chan interface{}) {
 	wg.Wait()
 }
 
-// Batch of users to send
-type batch struct {
-	users []User
-}
-
-func (b *batch) Add(user User) {
-	if !b.IsFull() {
-		b.users = append(b.users, user)
-	}
-}
-
-func (b batch) IsFull() bool {
-	return len(b.users) == 2
-}
-
-func (b batch) IsEmpty() bool {
-	return len(b.users) == 0
-}
-
-func (b *batch) Clear() []User {
-	users := b.users
-	b.users = nil
-	return users
-}
-
 func SelectMessages(in, out chan interface{}) {
 	// 	in - User
 	// 	out - MsgID
 
 	wg := &sync.WaitGroup{}
-	var batchUsers batch
+	const MAX_BATCH_SIZE = 2
+	batchUsers := []User{}
 	for user := range in {
-		batchUsers.Add(user.(User))
-		if batchUsers.IsFull() {
+		batchUsers = append(batchUsers, user.(User))
+		if len(batchUsers) == MAX_BATCH_SIZE {
 			wg.Add(1)
 			go func(wg *sync.WaitGroup, users []User) {
 				defer wg.Done()
@@ -83,11 +59,12 @@ func SelectMessages(in, out chan interface{}) {
 				for _, msgId := range msgIds {
 					out <- msgId
 				}
-			}(wg, batchUsers.Clear())
+			}(wg, batchUsers)
+			batchUsers = nil
 		}
 	}
 
-	if !batchUsers.IsEmpty() {
+	if len(batchUsers) > 0 {
 		wg.Add(1)
 		go func(wg *sync.WaitGroup, users []User) {
 			defer wg.Done()
@@ -95,7 +72,7 @@ func SelectMessages(in, out chan interface{}) {
 			for _, msgId := range msgIds {
 				out <- msgId
 			}
-		}(wg, batchUsers.Clear())
+		}(wg, batchUsers)
 	}
 
 	wg.Wait()
@@ -106,16 +83,14 @@ func CheckSpam(in, out chan interface{}) {
 	// out - MsgData
 
 	wg := &sync.WaitGroup{}
-	wg.Add(5)
-	for i := 0; i < 5; i++ {
+	const MAX_ROUTINES = 5
+	wg.Add(MAX_ROUTINES)
+	for i := 0; i < MAX_ROUTINES; i++ {
 		go func(wg *sync.WaitGroup, in, out chan interface{}) {
 			defer wg.Done()
 			for msgId := range in {
 				msgId := msgId.(MsgID)
-				hasSpam, err := HasSpam(msgId)
-				if err != nil {
-					fmt.Println(err)
-				}
+				hasSpam, _ := HasSpam(msgId)
 				msgData := MsgData{ID: msgId, HasSpam: hasSpam}
 				out <- msgData
 			}
