@@ -20,7 +20,6 @@ func RunPipeline(cmds ...cmd) {
 		in = out
 	}
 	wg.Wait()
-}
 
 func SelectUsers(in, out chan interface{}) {
 	// 	in - string
@@ -45,7 +44,6 @@ func SelectUsers(in, out chan interface{}) {
 func SelectMessages(in, out chan interface{}) {
 	// 	in - User
 	// 	out - MsgID
-
 	wg := &sync.WaitGroup{}
 	const MAX_BATCH_SIZE = 2
 	batchUsers := []User{}
