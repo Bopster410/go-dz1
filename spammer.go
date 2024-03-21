@@ -20,6 +20,7 @@ func RunPipeline(cmds ...cmd) {
 		in = out
 	}
 	wg.Wait()
+}
 
 func SelectUsers(in, out chan interface{}) {
 	// 	in - string
@@ -45,11 +46,10 @@ func SelectMessages(in, out chan interface{}) {
 	// 	in - User
 	// 	out - MsgID
 	wg := &sync.WaitGroup{}
-	const MAX_BATCH_SIZE = 2
 	batchUsers := []User{}
 	for user := range in {
 		batchUsers = append(batchUsers, user.(User))
-		if len(batchUsers) == MAX_BATCH_SIZE {
+		if len(batchUsers) == GetMessagesMaxUsersBatch {
 			wg.Add(1)
 			go func(wg *sync.WaitGroup, users []User) {
 				defer wg.Done()
@@ -81,9 +81,8 @@ func CheckSpam(in, out chan interface{}) {
 	// out - MsgData
 
 	wg := &sync.WaitGroup{}
-	const MAX_ROUTINES = 5
-	wg.Add(MAX_ROUTINES)
-	for i := 0; i < MAX_ROUTINES; i++ {
+	wg.Add(HasSpamMaxAsyncRequests)
+	for i := 0; i < HasSpamMaxAsyncRequests; i++ {
 		go func(wg *sync.WaitGroup, in, out chan interface{}) {
 			defer wg.Done()
 			for msgId := range in {
