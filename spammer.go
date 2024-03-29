@@ -29,15 +29,18 @@ func SelectUsers(in, out chan interface{}) {
 	wg := &sync.WaitGroup{}
 	users := &sync.Map{}
 	for email := range in {
-		wg.Add(1)
-		go func(wg *sync.WaitGroup, users *sync.Map, email string) {
-			defer wg.Done()
-			user := GetUser(email)
-			if _, exists := users.Load(user.ID); !exists {
-				users.Store(user.ID, true)
-				out <- user
-			}
-		}(wg, users, email.(string))
+		emailStr, ok := email.(string)
+		if ok {
+			wg.Add(1)
+			go func(wg *sync.WaitGroup, users *sync.Map, emailStr string) {
+				defer wg.Done()
+				user := GetUser(emailStr)
+				if _, exists := users.Load(user.ID); !exists {
+					users.Store(user.ID, true)
+					out <- user
+				}
+			}(wg, users, emailStr)
+		}
 	}
 	wg.Wait()
 }
@@ -48,14 +51,20 @@ func SelectMessages(in, out chan interface{}) {
 	wg := &sync.WaitGroup{}
 	batchUsers := []User{}
 	for user := range in {
-		batchUsers = append(batchUsers, user.(User))
+		userStruct, ok := user.(User)
+		if ok {
+			batchUsers = append(batchUsers, userStruct)
+		}
+
 		if len(batchUsers) == GetMessagesMaxUsersBatch {
 			wg.Add(1)
 			go func(wg *sync.WaitGroup, users []User) {
 				defer wg.Done()
-				msgIds, _ := GetMessages(users...)
-				for _, msgId := range msgIds {
-					out <- msgId
+				msgIds, err := GetMessages(users...)
+				if err == nil {
+					for _, msgId := range msgIds {
+						out <- msgId
+					}
 				}
 			}(wg, batchUsers)
 			batchUsers = nil
@@ -66,9 +75,11 @@ func SelectMessages(in, out chan interface{}) {
 		wg.Add(1)
 		go func(wg *sync.WaitGroup, users []User) {
 			defer wg.Done()
-			msgIds, _ := GetMessages(users...)
-			for _, msgId := range msgIds {
-				out <- msgId
+			msgIds, err := GetMessages(users...)
+			if err == nil {
+				for _, msgId := range msgIds {
+					out <- msgId
+				}
 			}
 		}(wg, batchUsers)
 	}
@@ -86,10 +97,14 @@ func CheckSpam(in, out chan interface{}) {
 		go func(wg *sync.WaitGroup, in, out chan interface{}) {
 			defer wg.Done()
 			for msgId := range in {
-				msgId := msgId.(MsgID)
-				hasSpam, _ := HasSpam(msgId)
-				msgData := MsgData{ID: msgId, HasSpam: hasSpam}
-				out <- msgData
+				msgIdStruct, ok := msgId.(MsgID)
+				if ok {
+					hasSpam, err := HasSpam(msgIdStruct)
+					if err == nil {
+						msgData := MsgData{ID: msgIdStruct, HasSpam: hasSpam}
+						out <- msgData
+					}
+				}
 			}
 		}(wg, in, out)
 	}
@@ -102,7 +117,10 @@ func CombineResults(in, out chan interface{}) {
 	// out - string
 	var data []MsgData
 	for msgData := range in {
-		data = append(data, msgData.(MsgData))
+		msgDataStruct, ok := msgData.(MsgData)
+		if ok {
+			data = append(data, msgDataStruct)
+		}
 	}
 
 	sort.Slice(data, func(i int, j int) bool {
